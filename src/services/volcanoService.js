@@ -24,6 +24,19 @@ export default {
         return query;
     },
 
+    async vote(volcanoId, userId){
+        const volcano = await Volcano.findById(volcanoId);
+
+        if (volcano.owner?.equals(userId)){
+            throw new Error ("You can't vote for your own volcanoes")
+        }
+         if (volcano.voteList.includes(userId)){
+            throw new Error ("You've already voted for this volcano")
+        }
+
+        volcano.voteList.push(userId);
+
+        return volcano.save();
     }
 
 }

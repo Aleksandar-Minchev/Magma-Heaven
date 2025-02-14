@@ -54,6 +54,18 @@ volcanoController.get('/:volcanoId/details', async (req, res) => {
         res.redirect('404');
     }
 });
+volcanoController.get('/:volcanoId/vote', isAuth, async (req, res) => {
+    const volcanoId = req.params.volcanoId
+    const userId = req.user.id;
+
+    try {
+        const volcano = await volcanoService.vote(volcanoId, userId);
+        res.redirect(`/volcanoes/${volcanoId}/details`)
+    } catch (err) {
+        res.redirect('404');
+    }
+});
+
 function volcanoTypesView (volcanoType){
     const volcanoTypesList = {
         'supervolcanoes': 'Supervolcanoes',
