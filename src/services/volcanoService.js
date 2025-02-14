@@ -12,9 +12,19 @@ export default {
 
     async getAll(filter = {}){
         let volcanoes = await Volcano.find({});
-        if (filter){
 
+        if (filter.name){
+            volcanoes = volcanoes.filter(volcano => 
+                volcano.name.toLowerCase().includes(filter.name.toLowerCase())
+            )
         }
+
+        if (filter.typeVolcano){
+            volcanoes = volcanoes.filter(volcano =>
+                volcano.typeVolcano == filter.typeVolcano
+            )
+        }
+        
     
         return volcanoes;
     },

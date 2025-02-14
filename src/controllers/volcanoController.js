@@ -16,6 +16,20 @@ volcanoController.get('/', async (req, res) => {
     }
 });
 
+volcanoController.get('/search', async (req, res) => {
+    const filter = req.query;
+
+    try {
+        const volcanoes = await volcanoService.getAll(filter);
+        res.render('volcanoes/search', {volcanoes, filter, volcanoTypes: volcanoTypesView()});   
+        
+    } catch (err) {
+        res.render('volcanoes/search', {
+            error: getErrorMessage(err)
+        });
+    }
+});
+
 volcanoController.get('/create', isAuth, (req, res) => {
     const volcanoTypes = volcanoTypesView();
 
