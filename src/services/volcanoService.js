@@ -17,6 +17,13 @@ export default {
         }
     
         return volcanoes;
+    },
+
+    getOne (volcanoId){
+        const query = Volcano.findById(volcanoId);
+        return query;
+    },
+
     }
 
 }

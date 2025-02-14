@@ -14,7 +14,6 @@ volcanoController.get('/', async (req, res) => {
             error: getErrorMessage(err)
         }); 
     }
-
 });
 
 volcanoController.get('/create', isAuth, (req, res) => {
@@ -40,6 +39,21 @@ volcanoController.post('/create', isAuth, async (req, res) => {
     }
 });
 
+volcanoController.get('/:volcanoId/details', async (req, res) => {
+    const volcanoId = req.params.volcanoId;
+
+    try {
+        const volcano = await volcanoService.getOne(volcanoId);
+
+        const isOwner = volcano.owner?.equals(req.user?.id);
+        const isVoted = volcano.voteList.includes(req.user?.id);
+
+        res.render('volcanoes/details', {volcano, isOwner, isVoted});
+        
+    } catch (err) {
+        res.redirect('404');
+    }
+});
 function volcanoTypesView (volcanoType){
     const volcanoTypesList = {
         'supervolcanoes': 'Supervolcanoes',
