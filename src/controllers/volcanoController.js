@@ -2,6 +2,7 @@ import { Router } from "express";
 import { isAuth } from "../middlewares/authMiddleware.js";
 import volcanoService from "../services/volcanoService.js";
 import { getErrorMessage } from "../utils/errorUtils.js";
+import { volcanoTypesView } from "../utils/volcanoUtils.js";
 
 const volcanoController = Router();
 
@@ -68,6 +69,7 @@ volcanoController.get('/:volcanoId/details', async (req, res) => {
         res.redirect('404');
     }
 });
+
 volcanoController.get('/:volcanoId/vote', isAuth, async (req, res) => {
     const volcanoId = req.params.volcanoId
     const userId = req.user.id;
@@ -80,23 +82,38 @@ volcanoController.get('/:volcanoId/vote', isAuth, async (req, res) => {
     }
 });
 
-function volcanoTypesView (volcanoType){
-    const volcanoTypesList = {
-        'supervolcanoes': 'Supervolcanoes',
-        'submarine': 'Submarine',
-        'subglacial': 'Subglacial',
-        'mud': 'Mud',
-        'stratovolcanoes': 'Stratovolcanoes',
-        'shield': 'Shield'
-    };
+volcanoController.get('/:volcanoId/edit', isAuth, async (req, res) => {
+    const volcanoId = req.params.volcanoId;
+    const volcano = await volcanoService.getOne(volcanoId);
+    const volcanoType = volcanoTypesView(volcano.typeVolcano)
 
-    const volcanoTypes = Object.keys(volcanoTypesList).map(value => ({
-        value,
-        label: volcanoTypesList[value],
-        selected: value === volcanoType ? 'selected' : '',
-    }));
+    if (!volcano.owner?.equals(req.user?.id)){
+        return res.redirect('404')
+    }
 
-    return volcanoTypes;
-}
+    res.render('volcanoes/edit', {volcano, volcanoType})
+});
+
+volcanoController.post('/:volcanoId/edit', isAuth, async (req, res) => {
+    const volcanoId = req.params.volcanoId;
+    const volcanoData = req.body;
+    const volcano = await volcanoService.getOne(volcanoId);
+    const volcanoType = volcanoTypesView(volcano.typeVolcano)
+
+    if (!volcano.owner?.equals(req.user?.id)){
+        return res.redirect('404')
+    }
+
+    try {
+        await volcanoService.change(volcanoData, volcanoId); 
+        res.redirect(`/volcanoes/${volcanoId}/details`);       
+    } catch (err) {
+        res.render('volcanoes/edit', {volcano: volcanoData, error: getErrorMessage(err), volcanoType})
+    }
+    
+});
+
+
+
 
 export default volcanoController;

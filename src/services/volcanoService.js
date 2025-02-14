@@ -17,14 +17,13 @@ export default {
             volcanoes = volcanoes.filter(volcano => 
                 volcano.name.toLowerCase().includes(filter.name.toLowerCase())
             )
-        }
+        };
 
         if (filter.typeVolcano){
             volcanoes = volcanoes.filter(volcano =>
                 volcano.typeVolcano == filter.typeVolcano
             )
-        }
-        
+        };        
     
         return volcanoes;
     },
@@ -47,6 +46,10 @@ export default {
         volcano.voteList.push(userId);
 
         return volcano.save();
-    }
+    },
+
+    async change (volcanoData, volcanoId){
+        return Volcano.findByIdAndUpdate(volcanoId, volcanoData, {runValidators: true});
+    },
 
 }
