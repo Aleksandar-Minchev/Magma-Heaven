@@ -5,8 +5,16 @@ import { getErrorMessage } from "../utils/errorUtils.js";
 
 const volcanoController = Router();
 
-volcanoController.get('/', (req, res) => {
-    res.render('volcanoes/catalog')
+volcanoController.get('/', async (req, res) => {
+    try {
+        const volcanoes = await volcanoService.getAll();
+        res.render('volcanoes/catalog', { volcanoes });        
+    } catch (err) {
+        res.render('/', {
+            error: getErrorMessage(err)
+        }); 
+    }
+
 });
 
 volcanoController.get('/create', isAuth, (req, res) => {
@@ -22,7 +30,7 @@ volcanoController.post('/create', isAuth, async (req, res) => {
 
     try {
         await volcanoService.create(volcanoData, ownerId);
-        res.redirect('volcanoes/catalog')
+        res.redirect('/volcanoes')
     } catch (err) {
         res.render('volcanoes/create', {
             error: getErrorMessage(err),

@@ -8,6 +8,15 @@ export default {
         })
 
         return result;
+    },
+
+    async getAll(filter = {}){
+        let volcanoes = await Volcano.find({});
+        if (filter){
+
+        }
+    
+        return volcanoes;
     }
 
 }
