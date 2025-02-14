@@ -113,7 +113,17 @@ volcanoController.post('/:volcanoId/edit', isAuth, async (req, res) => {
     
 });
 
+volcanoController.get('/:volcanoId/delete', isAuth, async (req, res) => {
+    const volcanoId = req.params.volcanoId;
+    const volcano = await volcanoService.getOne(volcanoId);
+    
+    if (!volcano.owner?.equals(req.user?.id)){
+        return res.redirect('404')
+    }
 
+    await volcanoService.remove(volcanoId)
 
+    res.redirect('/volcanoes');
+});
 
 export default volcanoController;
